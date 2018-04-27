@@ -1,0 +1,22 @@
+{
+  "name": "picture-downloader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "pictureDownloader.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/junyiz/picture-downloader.git"
+  },
+  "keywords": [
+    "downloader"
+  ],
+  "author": "Junyi Zhang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/junyiz/html-downloader/issues"
+  },
+  "homepage": "https://github.com/junyiz/picture-downloader#readme"
+}
