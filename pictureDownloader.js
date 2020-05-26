@@ -1,16 +1,27 @@
 const fs = require('fs')
 const http = require('http')
 const https = require('https')
-const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
+const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36'
 
 /**
  * 图片下载器
- * @param {string} url - 图片的网络地址
- * @param {string} dest - 保存图片的地址
- * @param {number} timeout - 超时时间，默认 3 分钟
- * @param {number} retries - 重试次数，默认重试 2 次
+ * @param options
+ * @param {string} options.url - 图片的网络地址
+ * @param {string} options.dest - 保存图片的地址
+ * @param {number} options.timeout - 超时时间，默认 3 分钟
+ * @param {number} options.retries - 重试次数，默认重试 2 次
+ * @param {string} options.userAgent
+ * @param {string} options.referer
  */
-module.exports = function pictureDownloader(url, dest, timeout = 3 * 60 * 1000, retries = 2) {
+module.exports = function pictureDownloader(options) {
+  let {
+    url,
+    dest,
+    timeout = 3 * 60 * 1000,
+    retries = 2,
+    userAgent,
+    referer
+  } = options
   let isRetry = false
   const request = url.startsWith('https') ? https.request : http.request
   const req = request(url, res => res.pipe(fs.createWriteStream(dest)))
@@ -19,7 +30,8 @@ module.exports = function pictureDownloader(url, dest, timeout = 3 * 60 * 1000, 
     isRetry = true
     req.abort()
   })
-  req.setHeader('User-Agent', userAgent)
+  req.setHeader('User-Agent', userAgent ? userAgent : UA)
+  if (referer) req.setHeader('Referer', referer)
   req.on('error', () => {
     retries--
     isRetry = true
