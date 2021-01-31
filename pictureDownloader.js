@@ -28,7 +28,7 @@ module.exports = function pictureDownloader(options) {
   req.setTimeout(timeout, () => {
     retries--
     isRetry = true
-    req.abort()
+    req.destroy()
   })
   req.setHeader('User-Agent', userAgent ? userAgent : UA)
   if (referer) req.setHeader('Referer', referer)
@@ -38,7 +38,14 @@ module.exports = function pictureDownloader(options) {
   })
   req.on('close', () => {
     // 重试时，将超时时间递增 1 分钟
-    if (isRetry && retries > 0) pictureDownloader(url, dest, timeout + 60 * 1000, retries)
+    if (isRetry && retries > 0) pictureDownloader({
+      url,
+      dest,
+      timeout: timeout + 60 * 1000,
+      retries,
+      userAgent,
+      referer
+    })
   })
   req.end()
 }
