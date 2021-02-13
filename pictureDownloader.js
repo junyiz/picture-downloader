@@ -22,20 +22,29 @@ module.exports = function pictureDownloader(options) {
     userAgent,
     referer
   } = options
+
   let isRetry = false
+
   const request = url.startsWith('https') ? https.request : http.request
+
   const req = request(url, res => res.pipe(fs.createWriteStream(dest)))
+
   req.setTimeout(timeout, () => {
     retries--
-    isRetry = true
+    isRetry = true // 超时需尝试重试
     req.destroy()
   })
+
   req.setHeader('User-Agent', userAgent ? userAgent : UA)
+
   if (referer) req.setHeader('Referer', referer)
-  req.on('error', () => {
+
+  req.on('error', (e) => {
     retries--
-    isRetry = true
+    isRetry = true // 发生错误需尝试重试
   })
+
+  // 连接关闭时，检查是否需要重试
   req.on('close', () => {
     // 重试时，将超时时间递增 1 分钟
     if (isRetry && retries > 0) pictureDownloader({
@@ -47,5 +56,6 @@ module.exports = function pictureDownloader(options) {
       referer
     })
   })
+
   req.end()
 }
